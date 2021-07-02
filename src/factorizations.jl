@@ -290,6 +290,13 @@ _cholesky(layout, axes, A, ::Val{true}; tol = 0.0, check::Bool = true) = cholesk
 _cholesky!(layout, axes, A, v::Val{tf}; kwds...) where tf = Base.invoke(cholesky!, Tuple{LinearAlgebra.RealHermSymComplexHerm,Val{tf}}, A, v; kwds...)
 _factorize(layout, axes, A) = qr(A) # Default to QR
 
+# Cholesky factorization without pivoting (copied from stdlib/LinearAlgebra).
+function _cholesky!(layout, axes, A::LinearAlgebra.RealHermSymComplexHerm, ::Val{false}; check::Bool = true)
+    C, info = LinearAlgebra._chol!(A.data, A.uplo == 'U' ? UpperTriangular : LowerTriangular)
+    check && LinearAlgebra.checkpositivedefinite(info)
+    return Cholesky(C.data, A.uplo, info)
+end
+
 _inv_eye(_, ::Type{T}, axs::NTuple{2,Base.OneTo{Int}}) where T = Matrix{T}(I, map(length,axs)...)
 function _inv_eye(A, ::Type{T}, (rows,cols)) where T
     dest = zero!(similar(A, T, (cols,rows)))
