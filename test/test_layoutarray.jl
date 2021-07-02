@@ -1,5 +1,6 @@
 using ArrayLayouts, LinearAlgebra, Test
 import ArrayLayouts: sub_materialize
+using BandedMatrices: BandedMatrix
 
 struct MyMatrix <: LayoutMatrix{Float64}
     A::Matrix{Float64}
@@ -95,6 +96,9 @@ MemoryLayout(::Type{MyVector}) = DenseColumnMajor()
             S = Symmetric(MyMatrix(reshape(inv.(1:25),5,5) + 10I))
             @test cholesky(S).U ≈ cholesky!(deepcopy(S)).U
             @test cholesky(S,Val(true)).U ≈ cholesky(Matrix(S),Val(true)).U
+
+            B = Symmetric(BandedMatrix(reshape(inv.(1:25),5,5) + 10I))
+            @test @inferred(cholesky(B)).U ≈ @inferred(cholesky!(deepcopy(B))).U
         end
         Bin = randn(5,5)
         B = MyMatrix(copy(Bin))
