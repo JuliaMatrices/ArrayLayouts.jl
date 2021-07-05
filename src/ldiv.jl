@@ -172,6 +172,7 @@ macro _layoutldiv(Typ)
         ret = quote
             $ret
             Base.:\(A::$Typ, x::LayoutMatrix) = ArrayLayouts.ldiv(A,x)
+            Base.:/(x::LayoutMatrix, A::$Typ) = ArrayLayouts.rdiv(x,A)
         end
     end
     esc(ret)
