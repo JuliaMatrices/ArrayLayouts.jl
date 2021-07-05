@@ -93,7 +93,7 @@ MemoryLayout(::Type{MyVector}) = DenseColumnMajor()
             @test inv(A) ≈ inv(A.A)
 
             S = Symmetric(MyMatrix(reshape(inv.(1:25),5,5) + 10I))
-            @test cholesky(S).U ≈ cholesky!(deepcopy(S)).U
+            @test cholesky(S).U ≈ @inferred(cholesky!(deepcopy(S))).U
             @test cholesky(S,Val(true)).U ≈ cholesky(Matrix(S),Val(true)).U
         end
         Bin = randn(5,5)
